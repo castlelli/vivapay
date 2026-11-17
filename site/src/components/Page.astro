@@ -270,6 +270,21 @@ const brl = (c: number) => (c / 100).toFixed(2).replace('.', ',');
       }
     }
 
+    // Scroll reveals where CSS scroll timelines are missing (Firefox, older Safari). See public/motion.css.
+    if (!reduce && !CSS.supports('animation-timeline: view()') && 'IntersectionObserver' in window) {
+      const sel = '.results .num, .how-head h2, .step h3, .ledger h2, .origin h2, .close h2, .results .sentence, .how-head p, .step p, .ledger-copy > p, .origin-body p, .close > p, .contact, .elsewhere, .how-note, .rules li, .voucher, .screen, .tape, .duotone';
+      const els = [...document.querySelectorAll<HTMLElement>(sel)];
+      const vh = innerHeight;
+      // Anything already on screen stays put; only what is below the fold waits to arrive.
+      const below = els.filter((e) => e.getBoundingClientRect().top > vh * 0.92);
+      els.filter((e) => !below.includes(e)).forEach((e) => e.classList.add('vp-in'));
+      document.documentElement.classList.add('vp-io');
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((en) => { if (en.isIntersecting) { en.target.classList.add('vp-in'); io.unobserve(en.target); } });
+      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.12 });
+      below.forEach((e) => io.observe(e));
+    }
+
     // Copy email, with a selectable address as the fallback.
     const copy = document.querySelector<HTMLButtonElement>('[data-copy]');
     if (copy && navigator.clipboard) {
