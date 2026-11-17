@@ -1,0 +1,285 @@
+---
+import QRCode from 'qrcode';
+import { strings, contact, type Lang } from '../i18n';
+import '../styles/global.css';
+
+interface Props { lang: Lang }
+const { lang } = Astro.props;
+const t = strings[lang];
+const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+const home = lang === 'en' ? `${base}/` : `${base}/pt/`;
+const other = lang === 'en' ? `${base}/pt/` : `${base}/`;
+const canonical = new URL(home, Astro.site).href;
+
+// A real, scannable QR that opens this page.
+const qr = await QRCode.toString(canonical, { type: 'svg', margin: 0, errorCorrectionLevel: 'M', color: { dark: '#11201B', light: '#0000' } });
+const qrSvg = qr.replace('<svg ', `<svg role="img" aria-label="${t.results.qrAlt}" `);
+
+const cents = (s: string) => Math.round(parseFloat(s.replace('−', '-').replace('+', '').replace(',', '.')) * 100);
+const total = t.ledger.rows.reduce((a, r) => a + cents(r[3]), 0);
+const brl = (c: number) => (c / 100).toFixed(2).replace('.', ',');
+---
+<!doctype html>
+<html lang={t.htmlLang}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{t.title}</title>
+  <meta name="description" content={t.description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="alternate" hreflang="en" href={new URL(`${base}/`, Astro.site).href} />
+  <link rel="alternate" hreflang="pt-BR" href={new URL(`${base}/pt/`, Astro.site).href} />
+  <link rel="icon" href={`${base}/favicon.svg`} type="image/svg+xml" />
+  <meta name="theme-color" content="#11201B" />
+  <meta property="og:title" content={t.title} />
+  <meta property="og:description" content={t.description} />
+  <meta property="og:image" content={new URL(`${base}/img/hero-1280.jpg`, Astro.site).href} />
+  <meta property="og:type" content="website" />
+  <link rel="preload" href={`${base}/fonts/schibsted-grotesk-latin-wght-normal.woff2`} as="font" type="font/woff2" crossorigin />
+  <link rel="preload" as="image" type="image/webp" imagesrcset={`${base}/img/hero-1280.webp 1280w, ${base}/img/hero-2400.webp 2400w`} imagesizes="100vw" />
+</head>
+<body>
+  <a class="skip" href="#main">{lang === 'en' ? 'Skip to content' : 'Pular para o conteúdo'}</a>
+
+  <header class="hero" id="top">
+    <div class="hero-media">
+      <div class="hero-plate">
+        <picture>
+          <source type="image/webp" srcset={`${base}/img/hero-1280.webp 1280w, ${base}/img/hero-2400.webp 2400w`} sizes="(max-width: 760px) 200vw, 100vw" />
+          <img src={`${base}/img/hero-1280.jpg`} srcset={`${base}/img/hero-1280.jpg 1280w, ${base}/img/hero-2400.jpg 2400w`} sizes="(max-width: 760px) 200vw, 100vw" width="2752" height="1536" alt={t.hero.imageAlt} fetchpriority="high" decoding="async" />
+        </picture>
+        <span class="card-mark" aria-hidden="true">Viva<span>Pay</span></span>
+        <span class="card-no" aria-hidden="true">{t.hero.cardNo}</span>
+      </div>
+    </div>
+
+    <nav class="nav" aria-label={lang === 'en' ? 'Main' : 'Principal'}>
+      <a class="wordmark" href={home} aria-label="VivaPay">Viva<span>Pay</span></a>
+      <ul>
+        <li><a href="#results">{t.nav.results}</a></li>
+        <li><a href="#how">{t.nav.how}</a></li>
+        <li><a href="#ledger">{t.nav.ledger}</a></li>
+        <li><a class="lang" href={other} hreflang={lang === 'en' ? 'pt-BR' : 'en'} aria-label={t.nav.switchLabel}>{t.nav.switchShort}</a></li>
+      </ul>
+    </nav>
+
+    <div class="hero-copy">
+      <h1><span>{t.hero.line1}</span> <em>{t.hero.line2}</em></h1>
+      <p class="lede">{t.hero.lede}</p>
+      <div class="actions">
+        <a class="btn" href="#talk">{t.hero.cta} <svg class="arrow" width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg></a>
+        <a class="link" href="#results">{t.hero.secondary}</a>
+      </div>
+    </div>
+
+    <dl class="rail">
+      {t.stats.map((s) => (<div><dt>{s.label}</dt><dd>{s.value}</dd></div>))}
+    </dl>
+  </header>
+
+  <main id="main">
+    <section class="results" id="results" aria-labelledby="results-h">
+      <figure class="duotone">
+        <picture>
+          <source type="image/webp" srcset={`${base}/img/crowd-900.webp 900w, ${base}/img/crowd-1600.webp 1600w`} sizes="(max-width: 900px) 100vw, 50vw" />
+          <img src={`${base}/img/crowd-900.jpg`} srcset={`${base}/img/crowd-900.jpg 900w, ${base}/img/crowd-1600.jpg 1600w`} sizes="(max-width: 900px) 100vw, 50vw" width="2400" height="1600" alt={t.results.photoAlt} loading="lazy" decoding="async" />
+        </picture>
+        <figcaption>{t.results.photoCredit}</figcaption>
+      </figure>
+      <div class="results-copy">
+        <h2 id="results-h"><span class="num">{t.results.big}</span> <span class="sentence">{t.results.body}</span></h2>
+        <div class="voucher">
+          <div class="v-row"><span>{t.results.voucherLabel}</span><span>Nº 0417</span></div>
+          <div class="v-qr" set:html={qrSvg} />
+          <div class="perf" aria-hidden="true"></div>
+          <div class="v-row"><span>{t.results.balance}</span><span>{t.results.sample}</span></div>
+          <div class="v-bal">R$ {brl(total)}</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="how" id="how" aria-labelledby="how-h">
+      <div class="how-head">
+        <h2 id="how-h">{t.how.title}</h2>
+        <p>{t.how.intro}</p>
+      </div>
+
+      <ol class="steps">
+        <li class="step">
+          <div class="step-copy">
+            <span class="step-n" aria-hidden="true">1</span>
+            <h3>{t.how.steps[0].title}</h3>
+            <p>{t.how.steps[0].body}</p>
+            <span class="client">{t.how.steps[0].client}</span>
+          </div>
+          <div class="screen desk" role="img" aria-label={`${t.how.steps[0].client}: ${t.how.steps[0].title}`}>
+            <div class="win-bar"><i></i><i></i><i></i><span>VivaManager</span></div>
+            <div class="win">
+              <aside>
+                <b class="wm-s">Viva<span>Manager</span></b>
+                <span class="on">Nova transação</span><span>Histórico de caixa</span><span>Cadastro lojas</span><span>Cadastro eventos</span><span>Relatórios</span>
+              </aside>
+              <div class="win-main">
+                <div class="win-title"><b>Nova transação</b><span>Olá, Caixa 2!</span></div>
+                <div class="seg"><span class="on">Depósito</span><span>Estorno</span></div>
+                <div class="fields">
+                  <label>Código<b>0417</b></label>
+                  <label>Valor<b>R$ 30,00</b></label>
+                  <label>Forma de pagamento<b>Pix</b></label>
+                  <label>Evento<b>VivaCTI</b></label>
+                </div>
+                <div class="win-foot"><div><small>Saldo</small><b>R$ 30,00</b></div><span class="efetivar">Efetivar</span></div>
+              </div>
+            </div>
+          </div>
+        </li>
+
+        <li class="step">
+          <div class="step-copy">
+            <span class="step-n" aria-hidden="true">2</span>
+            <h3>{t.how.steps[1].title}</h3>
+            <p>{t.how.steps[1].body}</p>
+            <span class="client">{t.how.steps[1].client}</span>
+          </div>
+          <div class="screen phone" role="img" aria-label={`${t.how.steps[1].client}: ${t.how.steps[1].title}`}>
+            <div class="ph-status"><span>19:48</span><span>Estande 07</span></div>
+            <div class="ph-title">Pagamento</div>
+            <div class="ph-cam"><div class="ph-frame" set:html={qr.replace('#11201B', '#EDEAE2')} /></div>
+            <div class="ph-field"><small>Voucher</small><b>0417</b></div>
+            <div class="ph-field"><small>Valor</small><b>R$ 3,50</b></div>
+            <div class="ph-pay">Pagar</div>
+            <div class="ph-toast">Pagamento aprovado · saldo R$ {brl(total)}</div>
+          </div>
+        </li>
+
+        <li class="step">
+          <div class="step-copy">
+            <span class="step-n" aria-hidden="true">3</span>
+            <h3>{t.how.steps[2].title}</h3>
+            <p>{t.how.steps[2].body}</p>
+            <span class="client">{t.how.steps[2].client}</span>
+          </div>
+          <div class="screen report" role="img" aria-label={`${t.how.steps[2].client}: ${t.how.steps[2].title}`}>
+            <div class="rp-head"><b class="wm-s">Viva<span>Pay</span></b><span>Relatório · Estande 07</span></div>
+            <div class="rp-meta"><span>VivaCTI</span><span>Data inicial — Data de encerramento</span></div>
+            <table>
+              <thead><tr><th>Tipo</th><th>Qtd.</th><th>Total</th></tr></thead>
+              <tbody>
+                <tr><td>Venda</td><td>212</td><td>R$ 1.084,50</td></tr>
+                <tr><td>Depósito</td><td>0</td><td>R$ 0,00</td></tr>
+                <tr><td>Estorno</td><td>3</td><td>R$ 14,00</td></tr>
+              </tbody>
+              <tfoot><tr><td>Líquido</td><td></td><td>R$ 1.070,50</td></tr></tfoot>
+            </table>
+            <span class="rp-stamp">Exemplo · Sample</span>
+          </div>
+        </li>
+      </ol>
+      <p class="how-note">{t.how.note}</p>
+    </section>
+
+    <section class="ledger" id="ledger" aria-labelledby="ledger-h">
+      <div class="ledger-copy">
+        <h2 id="ledger-h">{t.ledger.title}</h2>
+        <p>{t.ledger.body}</p>
+        <h3>{t.ledger.rulesTitle}</h3>
+        <ul class="rules">{t.ledger.rules.map((r) => <li>{r}</li>)}</ul>
+      </div>
+      <figure class="tape" data-ledger>
+        <figcaption><span>{t.ledger.caption}</span><button type="button" class="replay" data-replay hidden>{t.ledger.replay}</button></figcaption>
+        <table>
+          <thead><tr>{t.ledger.cols.map((c) => <th scope="col">{c}</th>)}</tr></thead>
+          <tbody>
+            {t.ledger.rows.map((r) => (
+              <tr data-cents={cents(r[3])} class={r[3].startsWith('+') ? 'cr' : 'db'}>
+                <td>{r[0]}</td><td>{r[1]}</td><td>{r[2]}</td><td>{r[3]}</td>
+              </tr>
+            ))}
+          </tbody>
+          <tfoot><tr><th scope="row" colspan="3">{t.ledger.total}</th><td><output data-total>R$ {brl(total)}</output></td></tr></tfoot>
+        </table>
+      </figure>
+    </section>
+
+    <section class="origin" aria-labelledby="origin-h">
+      <h2 id="origin-h">{t.origin.title}</h2>
+      <div class="origin-body">
+        <p>{t.origin.body}</p>
+        <a class="link" href={contact.github}>{t.origin.source} <svg class="arrow" width="16" height="10" viewBox="0 0 16 10" fill="none" aria-hidden="true"><path d="M1 5h13M10 1l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="square"/></svg></a>
+      </div>
+    </section>
+
+    <section class="close" id="talk" aria-labelledby="talk-h">
+      <h2 id="talk-h">{t.close.title} <em>{t.close.title2}</em></h2>
+      <p>{t.close.body}</p>
+      <div class="contact">
+        <a class="email" href={`mailto:${contact.email}`}>{contact.email}</a>
+        <button type="button" class="copy" data-copy={contact.email} data-done={t.close.copied} hidden>{t.close.copy}</button>
+      </div>
+      <ul class="elsewhere">
+        <li><a href={contact.linkedin}>LinkedIn</a></li>
+        <li><a href={contact.github}>GitHub</a></li>
+        <li><a href={contact.portfolio}>{t.footer.portfolio}</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <a class="wordmark" href="#top">Viva<span>Pay</span></a>
+    <p>{t.footer.credits}</p>
+    <p>© {t.footer.by} · <a href={other} hreflang={lang === 'en' ? 'pt-BR' : 'en'}>{t.nav.switchLabel}</a></p>
+  </footer>
+
+  <script>
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Signature interaction: the ledger replays. Rows append one by one and the derived balance recomputes.
+    const fig = document.querySelector<HTMLElement>('[data-ledger]');
+    if (fig) {
+      const rows = [...fig.querySelectorAll<HTMLTableRowElement>('tbody tr')];
+      const out = fig.querySelector<HTMLOutputElement>('[data-total]')!;
+      const btn = fig.querySelector<HTMLButtonElement>('[data-replay]')!;
+      const fmt = (c: number) => 'R$ ' + (c / 100).toFixed(2).replace('.', ',');
+      let timer = 0;
+      const play = () => {
+        clearTimeout(timer);
+        rows.forEach((r) => r.classList.add('pending'));
+        let sum = 0, i = 0;
+        out.value = fmt(0);
+        const next = () => {
+          const r = rows[i++];
+          if (!r) { fig.classList.remove('playing'); return; }
+          r.classList.remove('pending');
+          r.classList.add('landed');
+          sum += Number(r.dataset.cents);
+          out.value = fmt(sum);
+          out.classList.remove('tick'); void out.offsetWidth; out.classList.add('tick');
+          timer = window.setTimeout(next, 420);
+        };
+        fig.classList.add('playing');
+        timer = window.setTimeout(next, 250);
+      };
+      btn.hidden = false;
+      btn.addEventListener('click', play);
+      if (!reduce && 'IntersectionObserver' in window) {
+        const io = new IntersectionObserver((es) => {
+          if (es.some((e) => e.isIntersecting)) { io.disconnect(); play(); }
+        }, { threshold: 0.6 });
+        io.observe(fig);
+      }
+    }
+
+    // Copy email, with a selectable address as the fallback.
+    const copy = document.querySelector<HTMLButtonElement>('[data-copy]');
+    if (copy && navigator.clipboard) {
+      copy.hidden = false;
+      const label = copy.textContent;
+      copy.addEventListener('click', async () => {
+        try { await navigator.clipboard.writeText(copy.dataset.copy!); copy.textContent = copy.dataset.done!; }
+        catch { getSelection()?.selectAllChildren(document.querySelector('.email')!); }
+        setTimeout(() => (copy.textContent = label), 1800);
+      });
+    }
+  </script>
+</body>
+</html>
