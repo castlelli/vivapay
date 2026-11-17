@@ -184,6 +184,17 @@ A card-stock table in Fragment Mono, with dashed row rules, a 2px ink rule under
 ### App renders
 VivaManager window, VivaSales phone and the report, recreated in the system's palette on card stock. The original Portuguese labels are kept, the data is sample data, and a caption says so.
 
+### Scroll motion
+CSS scroll-driven only (`site/public/motion.css`, served unprocessed). Each family moves in its own way:
+- Display and section headlines rise 32px out of a 6px blur.
+- Body copy fades up 16px.
+- Photos open from a 14% top inset while the image settles from 1.12 scale.
+- Paper objects slide up 64px and keep their tilt, because they use the individual `translate` property.
+
+The hero photo drifts 72px slower than the page, and the hero copy lifts away as it leaves. Where scroll timelines are unsupported, or under reduced motion, everything is static and fully visible.
+
+**The Quiet Motion Rule.** Motion only accompanies arrival. Nothing loops, nothing scroll-jacks, and nothing moves more than 72px.
+
 ### Navigation
 Wordmark at left: "Viva" at 800 in paper, "Pay" at 400 in champagne. The links are Schibsted 500 14px in sage and turn paper on hover, and the language switch is always paper. On mobile only the language switch remains.
 

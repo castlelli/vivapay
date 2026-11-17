@@ -1,0 +1,33 @@
+/* Scroll motion. Served unprocessed so the minifier cannot fold animation-timeline into the shorthand. */
+/* ---------- Scroll motion ----------
+   Scroll-driven, CSS only. Content is fully visible where unsupported, without JS, and under reduced motion.
+   Each family moves differently: type rises out of a soft blur, photos open and settle, paper objects slide in
+   and keep their tilt (individual `translate` and `scale`, so their `transform` rotation is untouched). */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    @keyframes vp-rise { from { opacity: 0; translate: 0 32px; filter: blur(6px); } }
+    @keyframes vp-fade { from { opacity: 0; translate: 0 16px; } }
+    @keyframes vp-open { from { clip-path: inset(14% 0 0 0); } }
+    @keyframes vp-settle { from { scale: 1.12; } }
+    @keyframes vp-slide { from { opacity: 0; translate: 0 64px; } }
+    @keyframes vp-drift { to { translate: 0 72px; } }
+    @keyframes vp-lift { to { opacity: .15; translate: 0 -48px; } }
+
+    /* Hero: the photo drifts slower than the page; the copy lifts away as it leaves. */
+    .hero-plate { animation-name: vp-drift; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: scroll(root); animation-range: 0 100vh; }
+    .hero-copy { animation-name: vp-lift; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: scroll(root); animation-range: 0 85vh; }
+
+    .results .num, .how-head h2, .step h3, .ledger h2, .origin h2, .close h2 {
+      animation-name: vp-rise; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: view(); animation-range: entry 5% entry 75%;
+    }
+    .results .sentence, .how-head p, .step p, .ledger-copy > p, .origin-body p, .close > p, .contact, .elsewhere, .how-note {
+      animation-name: vp-fade; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: view(); animation-range: entry 15% entry 85%;
+    }
+    .rules li { animation-name: vp-fade; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: view(); animation-range: entry 10% entry 90%; }
+
+    .duotone { animation-name: vp-open; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: view(); animation-range: entry 0% cover 40%; }
+    .duotone img { animation-name: vp-settle; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: view(); animation-range: cover 0% cover 70%; }
+
+    .voucher, .screen, .tape { animation-name: vp-slide; animation-timing-function: linear; animation-fill-mode: both; animation-duration: auto; animation-timeline: view(); animation-range: entry 0% entry 80%; }
+  }
+}

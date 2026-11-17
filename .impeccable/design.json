@@ -227,6 +227,21 @@
         "name": "ledger-step",
         "value": "420ms",
         "purpose": "Interval between replayed ledger rows."
+      },
+      {
+        "name": "scroll-rise",
+        "value": "translate 0 32px + blur(6px) → none, view() entry 5–75%",
+        "purpose": "Headlines arriving."
+      },
+      {
+        "name": "scroll-slide",
+        "value": "translate 0 64px → 0, view() entry 0–80%",
+        "purpose": "Paper objects arriving, tilt preserved."
+      },
+      {
+        "name": "hero-drift",
+        "value": "translate 0 → 72px over 100vh, scroll(root)",
+        "purpose": "Hero photo parallax."
       }
     ],
     "breakpoints": [
@@ -326,6 +341,11 @@
         "name": "The Resting Object Rule",
         "body": "Only objects that would physically sit on a surface (a card, a ticket, a window) cast a shadow. Text blocks and sections never do.",
         "section": "elevation"
+      },
+      {
+        "name": "The Quiet Motion Rule",
+        "body": "Motion only accompanies arrival. Nothing loops, nothing scroll-jacks, and nothing moves more than 72px.",
+        "section": "components"
       }
     ],
     "dos": [
